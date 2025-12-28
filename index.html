@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bivouac Veterans News</title>
+  <style>
+    /* Simplified CSS for clarity */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 0;
+      line-height: 1.6;
+      color: #333;
+    }
+    header, footer { background: #004; color: #fff; padding: 1rem; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+    nav a { color: #fff; margin-right: 1rem; text-decoration: none; }
+    .layout { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .main { flex: 2; min-width: 300px; }
+    .sidebar { flex: 1; min-width: 200px; }
+    .card { background: #f9f9f9; margin-bottom: 1rem; padding: 1rem; border-radius: 6px; }
+    .card h2 { margin-top: 0; }
+    footer small { display: block; text-align: center; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Bivouac Veterans News</h1>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/news">News</a>
+        <a href="/trips">Trips</a>
+        <a href="/maps">Maps</a>
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container layout">
+    <section class="main">
+      <!-- Example article -->
+      <article class="card">
+        <h2>Latest Veteran News</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+        <a href="/news/123">Read more →</a>
+      </article>
+      <!-- More dynamically generated articles -->
+    </section>
+
+    <aside class="sidebar">
+      <div class="card">
+        <h3>Search Articles</h3>
+        <input type="search" placeholder="Search..." style="width:100%;">
+      </div>
+      <div class="card">
+        <h3>Upcoming Trips</h3>
+        <ul>
+          <li><a href="/trips/1">Trip to X</a></li>
+          <li><a href="/trips/2">Trip to Y</a></li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <div class="container">
+      <small>&copy; 2025 Bivouac Veterans News. All rights reserved.</small>
+    </div>
+  </footer>
+</body>
+</html>
+

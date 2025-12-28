@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Homelab Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <style>
+      /* Minimal additions; keep using your existing dashboard.css */
+      .host-group { margin: 18px 0 26px; }
+      .host-header {
+        display:flex; align-items:center; justify-content:space-between;
+        padding: 10px 12px;
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 14px;
+        background: rgba(255,255,255,0.04);
+        margin-bottom: 10px;
+      }
+      .host-title { display:flex; gap:10px; align-items:center; }
+      .host-badge {
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.06);
+      }
+      .host-kpis { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+      .kpi { font-size: 12px; opacity: .9; }
+      .kpi .mono { opacity: 1; }
+
+      .row.compact { margin-top: 6px; }
+      .bar {
+        width: 100%;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.10);
+        overflow: hidden;
+      }
+      .bar > .fill {
+        height: 100%;
+        width: 0%;
+        background: rgba(0, 220, 140, 0.75);
+        transition: width 200ms ease;
+      }
+      .bar > .fill.warn { background: rgba(255, 180, 0, 0.85); }
+      .bar > .fill.danger { background: rgba(255, 60, 60, 0.85); }
+
+      .value.bad { color: rgba(255, 60, 60, 0.95); }
+      .value.warn { color: rgba(255, 180, 0, 0.95); }
+      .value.ok { color: rgba(0, 220, 140, 0.95); }
+
+      .card-actions{
+        margin-top: 10px;
+        display:flex;
+        justify-content:flex-end;
+      }
+      .btn.small{
+        padding: 6px 10px;
+        border-radius: 10px;
+        font-size: 12px;
+      }
+
+      /* Host groups are created in JS; keep cards grid inside host-group */
+      .host-grid { display:grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
+      @media (max-width: 820px){ .host-grid { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+
+  <body>
+    <header class="topbar">
+      <div class="title">
+        <h1>Homelab Dashboard</h1>
+        <p class="subtitle">Grouped by host • Live health • Beszel metrics • Dozzle logs</p>
+      </div>
+
+      <div class="summary">
+        <div class="pill" id="summary-pill" title="Status">
+          <span class="dot neutral" id="summary-dot"></span>
+          <span id="summary-text">Checking…</span>
+        </div>
+        <button class="btn" id="refresh-btn" type="button">Refresh</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <!-- All cards start here; JS will regroup into host sections -->
+      <section id="cards-root">
+        {% for s in services %}
+        <a
+          class="card"
+          href="{{ s.url }}"
+          target="_blank"
+          rel="noopener"
+          data-service-id="{{ s.id }}"
+          data-dozzle-base="{{ s.dozzle_base }}"
+          data-beszel-host="{{ s.beszel_host }}"
+          data-beszel-container="{{ s.beszel_container }}"
+        >
+          <div class="card-header">
+            <div class="card-title">
+              <span class="status-dot neutral" data-dot></span>
+              <span class="name">{{ s.name }}</span>
+            </div>
+            <span class="badge" data-badge>…</span>
+          </div>
+
+          <div class="card-body">
+            <div class="row">
+              <div class="label">URL</div>
+              <div class="value mono">{{ s.url }}</div>
+            </div>
+
+            <div class="row">
+              <div class="label">Latency</div>
+              <div class="value mono" data-latency>—</div>
+            </div>
+
+            <div class="row">
+              <div class="label">Last check</div>
+              <div class="value mono" data-lastcheck>—</div>
+            </div>
+
+            <hr style="border:0;border-top:1px solid rgba(255,255,255,0.08);margin:12px 0;" />
+
+            <div class="row">
+              <div class="label">Host CPU</div>
+              <div class="value mono" data-host-cpu>—</div>
+            </div>
+
+            <div class="row">
+              <div class="label">Host RAM</div>
+              <div class="value mono" data-host-ram>—</div>
+            </div>
+
+            <div class="row compact">
+              <div class="label">RAM %</div>
+              <div class="value mono" data-host-mem-pct>—</div>
+            </div>
+            <div class="bar" title="Host RAM %">
+              <div class="fill" data-host-mem-bar></div>
+            </div>
+
+            <hr style="border:0;border-top:1px solid rgba(255,255,255,0.08);margin:12px 0;" />
+
+            <div class="row">
+              <div class="label">State</div>
+              <div class="value mono" data-ctr-status>—</div>
+            </div>
+
+            <div class="row">
+              <div class="label">Uptime</div>
+              <div class="value mono" data-ctr-uptime>—</div>
+            </div>
+
+            <div class="row">
+              <div class="label">Ctr CPU</div>
+              <div class="value mono" data-ctr-cpu>—</div>
+            </div>
+
+            <div class="row">
+              <div class="label">Ctr RAM</div>
+              <div class="value mono" data-ctr-ram>—</div>
+            </div>
+
+            <div class="row error" data-error-row style="display:none;">
+              <div class="label">Error</div>
+              <div class="value mono" data-error></div>
+            </div>
+
+            <div class="card-actions">
+              <button class="btn small" type="button" data-logs>Logs</button>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span class="mono" id="footer-time">—</span>
+    </footer>
+
+    <script>
+      window.DASHBOARD_POLL_MS = 5000;
+      window.DASHBOARD_WARN_PCT = 80;
+    </script>
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+  </body>
+</html>
