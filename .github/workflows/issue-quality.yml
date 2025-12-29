@@ -8,12 +8,12 @@ permissions:
   issues: write
 
 jobs:
-  bug_report_quality_gate:
-    name: Bug report quality check
+  issue_quality_gate:
+    name: Issue quality check
     runs-on: ubuntu-latest
 
     steps:
-      - name: Validate bug report content
+      - name: Validate issue content
         uses: actions/github-script@v7
         with:
           script: |
@@ -22,7 +22,11 @@ jobs:
             const issue = context.payload.issue;
 
             const labels = (issue.labels || []).map(l => (typeof l === 'string' ? l : l.name));
-            if (!labels.includes('bug')) return;
+            const isBug = labels.includes('bug');
+            const isFeature = labels.includes('enhancement');
+
+            // Only enforce for bug + feature issues created via your templates
+            if (!isBug && !isFeature) return;
 
             const body = (issue.body || '').trim();
 
@@ -34,67 +38,100 @@ jobs:
             }
 
             const placeholderPhrases = new Set([
-              'n/a','na','none','nothing','no','tbd','todo','unknown','-','--','idk',"i don't know",'i dont know'
+              'n/a','na','none','nothing','no','tbd','todo','unknown','-','--','idk',"i don't know",'i dont know',
+              'same as above','asdf','test'
             ]);
 
             function normalize(text) {
               return (text || '')
-                .replace(/<!--[\s\S]*?-->/g, '')     // strip comments
+                .replace(/<!--[\s\S]*?-->/g, '') // strip HTML comments
                 .replace(/\r/g, '')
                 .trim();
             }
 
+            function cleaned(text) {
+              return normalize(text).replace(/\s+/g, ' ').trim();
+            }
+
             function looksLikePlaceholder(text) {
-              const cleaned = normalize(text)
-                .replace(/\s+/g, ' ')
-                .toLowerCase();
-              if (!cleaned) return true;
-              if (placeholderPhrases.has(cleaned)) return true;
-              // Common "filler" patterns
-              if (cleaned === 'same as above') return true;
+              const c = cleaned(text).toLowerCase();
+              if (!c) return true;
+              if (placeholderPhrases.has(c)) return true;
               return false;
             }
 
             function tooShort(text, minLen) {
-              const cleaned = normalize(text).replace(/\s+/g, ' ');
-              return cleaned.length < minLen;
+              return cleaned(text).length < minLen;
             }
-
-            // Extract required-ish sections
-            const what = extractSection('What happened?');
-            const steps = extractSection('Steps to reproduce');
-            const expected = extractSection('Expected behavior');
-            const actual = extractSection('Actual behavior');
-
-            // Optional sections from your template
-            const logs = extractSection('Logs / screenshots');
-            const env = extractSection('Environment details');
 
             const problems = [];
+            const neededLabels = new Set();
 
-            // Stronger checks than "required"
-            if (looksLikePlaceholder(steps) || tooShort(steps, 25)) {
-              problems.push({ label: 'needs-repro', text: 'Steps to reproduce needs enough detail to follow (not N/A / too short).' });
-            }
-            if (looksLikePlaceholder(what) || tooShort(what, 15)) {
-              problems.push({ label: 'needs-info', text: 'What happened? needs a clear description (not placeholder / too short).' });
-            }
-            if (looksLikePlaceholder(expected) || tooShort(expected, 10)) {
-              problems.push({ label: 'needs-info', text: 'Expected behavior is missing or too vague.' });
-            }
-            if (looksLikePlaceholder(actual) || tooShort(actual, 10)) {
-              problems.push({ label: 'needs-info', text: 'Actual behavior is missing or too vague.' });
+            // ---- BUG ENFORCEMENT ----
+            if (isBug) {
+              const what = extractSection('What happened?');
+              const steps = extractSection('Steps to reproduce');
+              const expected = extractSection('Expected behavior');
+              const actual = extractSection('Actual behavior');
+
+              // Optional sections from your template
+              const logs = extractSection('Logs / screenshots');
+              const env = extractSection('Environment details');
+
+              if (looksLikePlaceholder(steps) || tooShort(steps, 25)) {
+                neededLabels.add('needs-repro');
+                problems.push('Steps to reproduce needs enough detail to follow (not N/A / too short).');
+              }
+              if (looksLikePlaceholder(what) || tooShort(what, 15)) {
+                neededLabels.add('needs-info');
+                problems.push('What happened? needs a clear description (not placeholder / too short).');
+              }
+              if (looksLikePlaceholder(expected) || tooShort(expected, 10)) {
+                neededLabels.add('needs-info');
+                problems.push('Expected behavior is missing or too vague.');
+              }
+              if (looksLikePlaceholder(actual) || tooShort(actual, 10)) {
+                neededLabels.add('needs-info');
+                problems.push('Actual behavior is missing or too vague.');
+              }
+
+              const hasLogs = !looksLikePlaceholder(logs) && !tooShort(logs, 10);
+              const hasEnv = !looksLikePlaceholder(env) && !tooShort(env, 10);
+
+              if (!hasLogs && !hasEnv) {
+                neededLabels.add('needs-logs');
+                problems.push('Please add logs/screenshots OR environment details so we can diagnose faster.');
+              }
             }
 
-            // “At least one useful artifact” rule (soft requirement, but helps a ton)
-            const hasLogs = !looksLikePlaceholder(logs) && !tooShort(logs, 10);
-            const hasEnv = !looksLikePlaceholder(env) && !tooShort(env, 10);
+            // ---- FEATURE ENFORCEMENT ----
+            if (isFeature) {
+              const problem = extractSection('Problem / Motivation');
+              const proposal = extractSection('Proposed solution');
+              const alternatives = extractSection('Alternatives considered'); // optional
+              const scope = extractSection('Scope / Notes'); // optional
 
-            if (!hasLogs && !hasEnv) {
-              problems.push({ label: 'needs-logs', text: 'Please add logs/screenshots OR environment details so we can diagnose faster.' });
+              if (looksLikePlaceholder(problem) || tooShort(problem, 25)) {
+                neededLabels.add('needs-spec');
+                problems.push('Problem / Motivation needs more detail (what are you trying to solve and why?).');
+              }
+              if (looksLikePlaceholder(proposal) || tooShort(proposal, 25)) {
+                neededLabels.add('needs-spec');
+                problems.push('Proposed solution needs enough detail to estimate and implement.');
+              }
+
+              // Soft nudge: if both optional fields are empty, encourage at least one
+              const hasAlt = !looksLikePlaceholder(alternatives) && !tooShort(alternatives, 10);
+              const hasScope = !looksLikePlaceholder(scope) && !tooShort(scope, 10);
+              if (!hasAlt && !hasScope) {
+                neededLabels.add('needs-spec');
+                problems.push('Optional but helpful: add Scope/Notes or Alternatives considered (edge cases, UX notes, tradeoffs).');
+              }
             }
 
-            // Helper to ensure labels exist and apply them
+            // Labels we manage (so we can remove them when issue becomes “healthy”)
+            const gateLabels = ['needs-info','needs-repro','needs-logs','needs-spec'];
+
             async function ensureLabels(labelNames) {
               for (const name of labelNames) {
                 try {
@@ -114,7 +151,6 @@ jobs:
               }
             }
 
-            // Remove quality-gate labels when issue is healthy
             async function removeLabel(name) {
               try {
                 await github.rest.issues.removeLabel({ owner, repo, issue_number: issue.number, name });
@@ -123,7 +159,6 @@ jobs:
               }
             }
 
-            const gateLabels = ['needs-info','needs-repro','needs-logs'];
             const botMarker = '<!-- watchforge-issue-quality-gate -->';
 
             async function alreadyCommented() {
@@ -132,19 +167,20 @@ jobs:
             }
 
             if (problems.length === 0) {
-              // Clean slate: remove labels if present
+              // Issue looks good now -> remove our labels if present
               for (const l of gateLabels) await removeLabel(l);
               return;
             }
 
-            const needed = [...new Set(problems.map(p => p.label))];
-            await ensureLabels(needed);
+            // Apply needed labels
+            await ensureLabels([...neededLabels]);
 
+            // Post a single comment (avoid spam)
             if (!(await alreadyCommented())) {
-              const checklist = problems.map(p => `- [ ] ${p.text}`).join('\n');
+              const checklist = problems.map(p => `- [ ] ${p}`).join('\n');
               const msg =
                 `${botMarker}\n` +
-                `Thanks for the report — a couple items need clarification before we can reliably reproduce or diagnose this.\n\n` +
+                `Thanks — a couple items need clarification before we can move this forward.\n\n` +
                 `${checklist}\n\n` +
                 `When you update the issue, these labels will clear automatically.\n`;
               await github.rest.issues.createComment({ owner, repo, issue_number: issue.number, body: msg });
