@@ -30,7 +30,7 @@ It is designed to run cleanly in Docker, be easy to extend, and *not make future
 ### 1️⃣ Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/watchforge.git
+git clone https://github.com/iampaulmata/watchforge.git
 cd watchforge
 ```
 
