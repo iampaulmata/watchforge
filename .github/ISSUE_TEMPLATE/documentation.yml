@@ -1,0 +1,38 @@
+name: 📚 Documentation
+description: Request or propose documentation changes.
+title: "[Docs]: "
+labels: ["documentation", "needs-triage"]
+assignees: []
+body:
+  - type: textarea
+    id: change
+    attributes:
+      label: What should be documented or changed?
+      placeholder: "Add/update docs for..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: location
+    attributes:
+      label: Where should it live?
+      description: README, Wiki, /docs, in-app help, etc.
+      placeholder: "e.g., README.md, docs/theming.md"
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context / Why?
+      placeholder: "This helps because..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: I searched existing issues and didn’t find a duplicate.
+          required: true

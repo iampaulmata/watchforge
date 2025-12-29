@@ -1,0 +1,34 @@
+name: 🧹 Chore / Maintenance
+description: Refactors, dependencies, CI, cleanup, and other maintenance work.
+title: "[Chore]: "
+labels: ["chore", "needs-triage"]
+assignees: []
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      placeholder: "What needs to be done?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Details / Acceptance criteria
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact
+      options:
+        - Low (internal cleanup)
+        - Medium (developer experience)
+        - High (affects users)
+    validations:
+      required: true

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/iampaulmata/watchforge/discussions
+    about: Ask questions, propose ideas, and discuss architecture before filing big issues.
