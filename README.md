@@ -65,8 +65,8 @@ services:
       DASH_DB_PATH: /data/dashboard.db
       DASH_WARN_PCT: "80"
       DASH_DANGER_PCT: "95"
-      BESZEL_BASE_URL: http://paranor:8090
-      DOZZLE_BASE_URL: http://paranor:8080
+      BESZEL_BASE_URL: http://<host>:8090
+      DOZZLE_BASE_URL: http://<host>:8080
       DASH_ADMIN_USER: admin
     secrets:
       - dash_admin_password
