@@ -2,7 +2,7 @@
   "schema": "homelab-dashboard-theme@1",
   "name": "Lantern Light",
   "id": "lantern-light",
-  "author": "iampaulmata",
+  "author": "@iampaulmata",
   "description": "Clean light theme with subtle borders and calm accents.",
   "mode": "light",
   "tokens": {

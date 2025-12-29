@@ -87,6 +87,13 @@
                       {% if t.is_public %}Unpublish{% else %}Publish{% endif %}
                     </button>
                   </form>
+                  <form method="post" action="/themes/{{ t.id }}/delete" style="display:inline;"
+                      onsubmit="return confirmDelete('{{ t.name|e }}', '{{ t.slug|e }}', {{ 'true' if (active_slug and t.slug == active_slug) else 'false' }});">
+                  <button class="btn danger" type="submit" {% if active_slug and t.slug == active_slug %}disabled{% endif %}>
+                    Delete
+                  </button>
+                </form>
+
                 </div>
               </div>
 
@@ -198,6 +205,14 @@
         // fallback
         prompt("Copy this URL:", url);
       }
+    }
+
+    function confirmDelete(name, slug, isActive) {
+      if (isActive) {
+        alert("You can't delete the active theme. Activate a different theme first.");
+        return false;
+      }
+      return confirm(`Delete theme "${name}" (${slug})?\n\nThis cannot be undone.`);
     }
   </script>
 </body>

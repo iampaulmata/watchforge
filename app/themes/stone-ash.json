@@ -2,7 +2,7 @@
   "schema": "homelab-dashboard-theme@1",
   "name": "Stone Ash",
   "id": "stone-ash",
-  "author": "iampaulmata",
+  "author": "@iampaulmata",
   "description": "Eggshell + light grey theme with warm neutrals and soft contrast.",
   "mode": "light",
   "tokens": {

@@ -1,0 +1,40 @@
+{
+  "schema": "homelab-dashboard-theme@1",
+  "name": "Verdant Forge",
+  "id": "verdant-forge",
+  "author": "@iampaulmata",
+  "description": "Forest/grassland dark theme with grounded greens and forge-steady contrast.",
+  "mode": "dark",
+  "tokens": {
+    "--bg": "#0F1A14",
+    "--surface": "rgba(228, 239, 232, 0.05)",
+    "--surface-2": "rgba(228, 239, 232, 0.09)",
+    "--text": "#E4EFE8",
+    "--muted": "rgba(228, 239, 232, 0.70)",
+    "--border": "rgba(228, 239, 232, 0.16)",
+
+    "--accent": "#7AC9A3",
+    "--accent-2": "#5FB38C",
+
+    "--good": "#22c55e",
+    "--warn": "#f59e0b",
+    "--bad": "#ef4444",
+
+    "--radius": "16px",
+    "--shadow": "0 12px 30px rgba(0, 0, 0, 0.45)",
+    "--blur": "6px",
+    "--glass": "0.60",
+
+    "--ui-font": "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+    "--mono-font": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace",
+    "--text-size": "14px",
+    "--title-size": "18px",
+
+    "--pad": "16px",
+    "--gap": "14px",
+    "--compact": "0",
+
+    "--warn-pct": "80",
+    "--danger-pct": "95"
+  }
+}
