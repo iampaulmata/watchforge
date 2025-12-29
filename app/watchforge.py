@@ -4,7 +4,7 @@ from flask import Flask, flash, render_template, request, redirect, url_for, ses
 from werkzeug.security import check_password_hash, generate_password_hash
 from .db import db, Service, ServiceSecret, CheckResult, MetricsSnapshot, Theme, AppSetting
 
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.background import BackgroundScheduler # pyright: ignore[reportMissingImports]
 
 from .config import Settings
 from .db import db, Service, ServiceSecret, CheckResult, MetricsSnapshot, Theme
