@@ -2,7 +2,7 @@
   "schema": "homelab-dashboard-theme@1",
   "name": "Emberforge Dark",
   "id": "emberforge-dark",
-  "author": "iampaulmata",
+  "author": "@iampaulmata",
   "description": "Dark slate/charcoal with ember orange accents. Glassy cards, warm highlights.",
   "mode": "dark",
   "tokens": {

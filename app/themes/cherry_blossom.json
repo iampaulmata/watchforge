@@ -1,0 +1,40 @@
+{
+  "schema": "homelab-dashboard-theme@1",
+  "name": "Cherry Blossom",
+  "id": "cherry-blossom",
+  "author": "@iampaulmata",
+  "description": "Sakura-inspired light theme with warm off-white background, plum text, and blossom accents.",
+  "mode": "light",
+  "tokens": {
+    "--bg": "#FAF7F8",
+    "--surface": "rgba(43, 31, 36, 0.035)",
+    "--surface-2": "rgba(43, 31, 36, 0.06)",
+    "--text": "#2B1F24",
+    "--muted": "rgba(43, 31, 36, 0.68)",
+    "--border": "rgba(43, 31, 36, 0.13)",
+
+    "--accent": "#B84A74",
+    "--accent-2": "#E79AB5",
+
+    "--good": "#cf5bc3",
+    "--warn": "#e846aa",
+    "--bad": "#8a0155",
+
+    "--radius": "16px",
+    "--shadow": "0 10px 26px rgba(43, 31, 36, 0.10)",
+    "--blur": "6px",
+    "--glass": "0.65",
+
+    "--ui-font": "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+    "--mono-font": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace",
+    "--text-size": "14px",
+    "--title-size": "18px",
+
+    "--pad": "16px",
+    "--gap": "14px",
+    "--compact": "0",
+
+    "--warn-pct": "80",
+    "--danger-pct": "95"
+  }
+}

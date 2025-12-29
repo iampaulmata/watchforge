@@ -1,0 +1,40 @@
+{
+  "schema": "homelab-dashboard-theme@1",
+  "name": "Ocean Depths",
+  "id": "ocean-depths",
+  "author": "@iampaulmata",
+  "description": "Deep navy dark theme with ocean-blue accents and high readability.",
+  "mode": "dark",
+  "tokens": {
+    "--bg": "#0B1620",
+    "--surface": "rgba(230, 241, 248, 0.05)",
+    "--surface-2": "rgba(230, 241, 248, 0.09)",
+    "--text": "#E6F1F8",
+    "--muted": "rgba(230, 241, 248, 0.70)",
+    "--border": "rgba(230, 241, 248, 0.16)",
+
+    "--accent": "#66BCFF",
+    "--accent-2": "#3FA9F5",
+
+    "--good": "#22c55e",
+    "--warn": "#f59e0b",
+    "--bad": "#ef4444",
+
+    "--radius": "16px",
+    "--shadow": "0 12px 30px rgba(0, 0, 0, 0.45)",
+    "--blur": "6px",
+    "--glass": "0.60",
+
+    "--ui-font": "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+    "--mono-font": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace",
+    "--text-size": "14px",
+    "--title-size": "18px",
+
+    "--pad": "16px",
+    "--gap": "14px",
+    "--compact": "0",
+
+    "--warn-pct": "80",
+    "--danger-pct": "95"
+  }
+}

@@ -1,6 +1,6 @@
 import json
 import time
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, abort, Response
+from flask import Flask, flash, render_template, request, redirect, url_for, session, jsonify, abort, Response
 from werkzeug.security import check_password_hash, generate_password_hash
 from .db import db, Service, ServiceSecret, CheckResult, MetricsSnapshot, Theme, AppSetting
 
@@ -237,18 +237,32 @@ def themes_list():
     return render_template("themes.html", themes=themes, active_slug=active_slug)
 
 @app.route("/themes/<int:theme_id>/edit")
-def themes_edit(theme_id):
+def themes_edit(theme_id: int):
     gate = require_login()
-    if gate: return gate
+    if gate:
+        return gate
 
     theme = Theme.query.get_or_404(theme_id)
-    # You can enforce per-user ownership here if you want.
+
+    # Ownership enforcement (Option A + B)
+    owner_id = theme.created_by_user_id
+    user_id = session.get("user_id")
+    try:
+        user_id = int(user_id) if user_id is not None else None
+    except (TypeError, ValueError):
+        user_id = None
+
+    if owner_id is not None and owner_id != user_id:
+        abort(403)
+
     tokens = {}
     try:
-        tokens = json.loads(theme.tokens_json)
+        tokens = json.loads(theme.tokens_json or "{}")
     except Exception:
         tokens = {}
+
     return render_template("themes_editor.html", theme=theme, tokens_json=tokens)
+
 
 @app.route("/themes/create", methods=["POST"])
 def themes_create():
@@ -279,7 +293,7 @@ def themes_create():
         mode=meta.get("mode") if meta.get("mode") in ("light","dark") else "dark",
         is_public=bool(meta.get("is_public", False)),
         tokens_json=json.dumps(tokens),
-        created_by_user_id=session["user_id"]
+        created_by_user_id=int(session["user_id"])
     )
     db.session.add(theme)
     db.session.commit()
@@ -293,13 +307,22 @@ def themes_new():
 
 
 @app.route("/themes/<int:theme_id>/update", methods=["POST"])
-def themes_update(theme_id):
+def themes_update(theme_id: int):
     gate = require_login()
-    if gate: return jsonify({"error":"unauthorized"}), 401
+    if gate:
+        return jsonify({"error": "unauthorized"}), 401
 
     theme = Theme.query.get_or_404(theme_id)
-    # Optional: enforce ownership (recommended)
-    if theme.created_by_user_id != session["user_id"]:
+
+    # Ownership enforcement (Option A + B)
+    owner_id = theme.created_by_user_id
+    user_id = session.get("user_id")
+    try:
+        user_id = int(user_id) if user_id is not None else None
+    except (TypeError, ValueError):
+        user_id = None
+
+    if owner_id is not None and owner_id != user_id:
         abort(403)
 
     payload = request.get_json(force=True)
@@ -308,16 +331,22 @@ def themes_update(theme_id):
 
     name = (meta.get("name") or "").strip()
     if not name:
-        return jsonify({"error":"name required"}), 400
+        return jsonify({"error": "name required"}), 400
 
     theme.name = name
     theme.author = (meta.get("author") or "").strip() or None
     theme.description = (meta.get("description") or "").strip() or None
-    theme.mode = meta.get("mode") if meta.get("mode") in ("light","dark") else theme.mode
+    theme.mode = meta.get("mode") if meta.get("mode") in ("light", "dark") else theme.mode
     theme.is_public = bool(meta.get("is_public", False))
     theme.tokens_json = json.dumps(tokens)
+
+    # Optional: “claim” legacy themes when you edit them (nice cleanup)
+    if theme.created_by_user_id is None and user_id is not None:
+        theme.created_by_user_id = user_id
+
     db.session.commit()
     return jsonify({"ok": True})
+
 
 @app.route("/themes/import", methods=["POST"])
 def themes_import():
@@ -356,6 +385,42 @@ def themes_import():
     db.session.commit()
     return jsonify({"ok": True, "id": theme.id})
 
+@app.route("/themes/<int:theme_id>/delete", methods=["POST"])
+def themes_delete(theme_id: int):
+    gate = require_login()
+    if gate:
+        return gate
+
+    theme = Theme.query.get_or_404(theme_id)
+
+    # ---- Ownership enforcement (Option A + B) ----
+    owner_id = theme.created_by_user_id
+    user_id = session.get("user_id")
+
+    # normalize session user_id to int (handles string/int mismatch)
+    try:
+        user_id = int(user_id) if user_id is not None else None
+    except (TypeError, ValueError):
+        user_id = None
+
+    # Allow delete if:
+    # - theme has no owner (legacy theme), OR
+    # - theme is owned by current user
+    if owner_id is not None and owner_id != user_id:
+        abort(403)
+    # ---------------------------------------------
+
+    active_slug = get_active_theme_slug()
+    if active_slug and theme.slug == active_slug:
+        flash("Can't delete the active theme. Activate a different theme first.", "error")
+        return redirect(url_for("themes_list"))
+
+    db.session.delete(theme)
+    db.session.commit()
+
+    flash(f'Deleted theme "{theme.name}".', "success")
+    return redirect(url_for("themes_list"))
+
 @app.route("/theme.css")
 def theme_css():
     # allow unauth; it’s just CSS
@@ -379,7 +444,15 @@ def theme_css():
     if theme and theme.mode in ("light","dark"):
         css += f":root{{ color-scheme: {theme.mode}; }}\n"
 
-    return Response(css, mimetype="text/css")
+    resp = Response(css, mimetype="text/css")
+
+    # ✅ Per-user / session-dependent CSS should not be shared by caches
+    resp.headers["Cache-Control"] = "no-store, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    resp.headers["Vary"] = "Cookie"
+
+    return resp
 
 @app.route("/themes/<int:theme_id>/activate", methods=["POST"])
 def activate_theme(theme_id):

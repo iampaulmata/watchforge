@@ -329,3 +329,213 @@ input[type="color"].input{
 /* Density hint (a tiny tweak) */
 body[data-compact="1"] .row{ padding: 4px 0; }
 body[data-compact="1"] .card-body{ padding: 10px 12px; }
+
+/* Theme cards should use theme tokens, not hardcoded white */
+.theme-card,
+.theme-tile,
+.card { /* include whatever class your theme tiles actually use */
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  backdrop-filter: blur(var(--blur));
+}
+
+/* If you have a subtle inner section on the card */
+.theme-card .section,
+.theme-card .meta,
+.card .section {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 6px);
+}
+
+/* Pills/badges on the theme cards */
+.badge,
+.pill {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* Links/buttons inside the cards */
+.theme-card a,
+.card a {
+  color: var(--accent);
+}
+.theme-card a:hover,
+.card a:hover {
+  color: var(--accent-2);
+}
+/* Themes page layout helpers */
+.panel-head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.panel-head__left { display: grid; gap: 6px; }
+.panel-head__right {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.panel-title { margin: 0; }
+
+.panel--spaced { margin-top: var(--gap); }
+
+.panel-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* Theme grid + card structure */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--gap);
+}
+
+.theme-card { cursor: default; }
+
+.theme-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.theme-card__title {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.theme-badges {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.theme-card__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.inline-form { display: inline; }
+
+.theme-card__footer { padding-top: 0; }
+
+.theme-card__tools {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.theme-card__hint { margin-top: 10px; }
+
+/* Danger button */
+.btn.danger {
+  border-color: rgba(220, 38, 38, 0.35);
+  color: var(--bad);
+}
+
+.btn.danger:hover {
+  border-color: rgba(220, 38, 38, 0.55);
+}
+
+/* Optional: disabled danger button readability */
+.btn.danger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ============================
+   THEMES PAGE: TOKEN OVERRIDES
+   Fixes dark-theme readability
+   ============================ */
+
+/* Ensure the page uses theme background + text */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--ui-font);
+  font-size: var(--text-size);
+}
+
+/* Panels should be theme surfaces, not hard-coded gray */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  backdrop-filter: blur(var(--blur));
+}
+
+/* Cards should be theme surfaces too */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  color: var(--text);
+}
+
+/* If you have any inner “sections” that were tinted */
+.card-body,
+.card-header {
+  color: var(--text);
+}
+
+/* Small helper text must use muted token */
+.small-note {
+  color: var(--muted);
+}
+
+/* Pills + badges should not default to light backgrounds */
+.pill,
+.badge {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* Links inside cards/panels */
+a {
+  color: var(--accent);
+}
+a:hover {
+  color: var(--accent-2);
+}
+
+/* Buttons: ensure they’re not forcing light backgrounds */
+.btn {
+  color: var(--text);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.btn:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* Keep your danger button readable across themes */
+.btn.danger {
+  color: var(--bad);
+  border-color: rgba(220, 38, 38, 0.45);
+  background: transparent;
+}
+.btn.danger:hover {
+  border-color: rgba(220, 38, 38, 0.70);
+}

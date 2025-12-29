@@ -1,0 +1,122 @@
+/* Uses theme tokens from theme.css */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--ui-font, system-ui, sans-serif);
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+a { color: var(--accent); }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+th, td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  text-align: left;
+  color: var(--muted);
+  background: var(--surface-2);
+}
+
+button {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+/* button-like link */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none; /* make anchors look like buttons */
+  cursor: pointer;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.btn:hover {
+  filter: brightness(1.05);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+/* optional: make delete slightly more "danger" without hard red */
+.btn-danger {
+  border-color: color-mix(in srgb, var(--border) 70%, var(--bad) 30%);
+}
+
+/* keep the actions tight */
+.actions {
+  white-space: nowrap;
+}
+.actions .btn {
+  margin-right: 8px;
+}
+.actions form {
+  display: inline;
+}
+
+/* ----- Forms ----- */
+form {
+  width: 100%;
+  max-width: 100%;
+}
+
+label {
+  display: block;
+  margin: 14px 0 6px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+input[type="checkbox"] {
+  width: auto;
+}
+
+/* header area spacing */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
