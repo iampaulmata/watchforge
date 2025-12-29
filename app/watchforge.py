@@ -379,7 +379,15 @@ def theme_css():
     if theme and theme.mode in ("light","dark"):
         css += f":root{{ color-scheme: {theme.mode}; }}\n"
 
-    return Response(css, mimetype="text/css")
+    resp = Response(css, mimetype="text/css")
+
+    # ✅ Per-user / session-dependent CSS should not be shared by caches
+    resp.headers["Cache-Control"] = "no-store, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    resp.headers["Vary"] = "Cookie"
+
+    return resp
 
 @app.route("/themes/<int:theme_id>/activate", methods=["POST"])
 def activate_theme(theme_id):
