@@ -1,0 +1,40 @@
+services:
+  dashboard:
+    build: .
+    container_name: homelab-dashboard
+    ports:
+      - "5000:5000"
+    environment:
+      TZ: "America/New_York"
+      DASH_POLL_HEALTH_SECONDS: "10"
+      DASH_POLL_METRICS_SECONDS: "10"
+      DASH_WARN_PCT: "80"
+      DASH_DANGER_PCT: "95"
+      DASH_DB_PATH: "/data/dashboard.db"
+      BESZEL_BASE_URL: "http://paranor:8090"
+      DOZZLE_BASE_URL: "http://paranor:8080"
+      DASH_ADMIN_USER: "admin"
+    secrets:
+      - dash_admin_password
+      - beszel_email
+      - beszel_password
+      - app_encryption_key
+    volumes:
+      - dashboard_data:/data
+      - ./app:/app/app
+    restart: unless-stopped
+
+secrets:
+  dash_admin_password:
+    file: ./secrets/dash_admin_password.txt
+  beszel_email:
+    file: ./secrets/beszel_email.txt
+  beszel_password:
+    file: ./secrets/beszel_password.txt
+  app_encryption_key:
+    file: ./secrets/app_encryption_key.txt
+
+volumes:
+  dashboard_data:
+
+

@@ -1,0 +1,91 @@
+############################
+# Python
+############################
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.pytype/
+.ruff_cache/
+
+############################
+# Flask / App runtime
+############################
+
+# Local SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Instance / runtime data
+instance/
+data/
+data/*
+/data
+
+############################
+# Docker
+############################
+
+# Docker build artifacts
+*.tar
+
+# Local override files
+docker-compose.override.yml
+
+############################
+# Secrets & credentials
+############################
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Docker secrets (if ever stored locally)
+secrets/
+*.secret
+*.key
+
+############################
+# OS / Editor
+############################
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+
+# JetBrains
+.idea/
+
+############################
+# Logs
+############################
+
+*.log
+logs/
+
+############################
+# Screenshots / media (optional for now)
+############################
+
+# Uncomment when you add screenshots later
+# screenshots/

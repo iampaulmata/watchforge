@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Homelab Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+  <link rel="stylesheet" href="/theme.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="title">
+      <h1>Homelab Dashboard</h1>
+      <p class="subtitle">Grouped by host • Live health • Beszel metrics • Dozzle logs</p>
+    </div>
+    <div class="summary">
+      <div class="summary">
+        <div class="pill" id="summary-pill"><span class="dot neutral" id="summary-dot"></span><span id="summary-text">Checking…</span></div>
+        <button class="btn" id="refresh-btn" type="button">Refresh</button>
+        <a class="btn" href="/services" style="margin-left:8px">Manage</a>
+        <a class="btn" href="/themes">Themes</a>
+        <a class="btn" href="/logout" style="margin-left:8px">Logout</a>
+      </div>
+
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="cards-root">
+      {% for s in services %}
+      <a class="card"
+         href="{{ s.url }}"
+         target="_blank"
+         rel="noopener"
+         data-service-id="{{ s.slug }}"
+         data-dozzle-base="{{ (config.DOZZLE_BASE_URL if config else '') }}"
+         data-beszel-host="{{ s.beszel_host or '' }}"
+         data-beszel-container="{{ s.beszel_container or '' }}">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="status-dot neutral" data-dot></span>
+            <span class="name">{{ s.name }}</span>
+          </div>
+          <span class="badge" data-badge>…</span>
+        </div>
+
+        <div class="card-body">
+          <div class="row"><div class="label">URL</div><div class="value mono">{{ s.url }}</div></div>
+          <div class="row"><div class="label">Latency</div><div class="value mono" data-latency>—</div></div>
+          <div class="row"><div class="label">Last check</div><div class="value mono" data-lastcheck>—</div></div>
+
+          <hr class="sep" />
+
+          <div class="row"><div class="label">Host CPU</div><div class="value mono" data-host-cpu>—</div></div>
+          <div class="row"><div class="label">Host RAM</div><div class="value mono" data-host-ram>—</div></div>
+          <div class="row"><div class="label">RAM %</div><div class="value mono" data-host-mem-pct>—</div></div>
+          <div class="bar"><div class="fill" data-host-mem-bar></div></div>
+
+          <hr class="sep" />
+
+          <div class="row"><div class="label">State</div><div class="value mono" data-ctr-status>—</div></div>
+          <div class="row"><div class="label">Uptime</div><div class="value mono" data-ctr-uptime>—</div></div>
+          <div class="row"><div class="label">Ctr CPU</div><div class="value mono" data-ctr-cpu>—</div></div>
+          <div class="row"><div class="label">Ctr RAM</div><div class="value mono" data-ctr-ram>—</div></div>
+
+          <div class="card-actions">
+            <button class="btn small" type="button" data-logs>Logs</button>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </section>
+  </main>
+
+  <footer class="footer"><span class="mono" id="footer-time">—</span></footer>
+
+  <script>
+    window.DASHBOARD_POLL_MS = 5000;
+/*     window.DASHBOARD_WARN_PCT = {{ warn_pct }};
+    window.DASHBOARD_DANGER_PCT = {{ danger_pct }}; */
+    window.DOZZLE_BASE_URL = "{{ Settings.DOZZLE_BASE_URL if Settings else '' }}";
+  </script>
+  <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+</body>
+</html>

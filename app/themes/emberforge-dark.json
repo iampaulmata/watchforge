@@ -1,0 +1,40 @@
+{
+  "schema": "homelab-dashboard-theme@1",
+  "name": "Emberforge Dark",
+  "id": "emberforge-dark",
+  "author": "iampaulmata",
+  "description": "Dark slate/charcoal with ember orange accents. Glassy cards, warm highlights.",
+  "mode": "dark",
+  "tokens": {
+    "--bg": "#0b0f14",
+    "--surface": "rgba(255,255,255,0.035)",
+    "--surface-2": "rgba(255,255,255,0.06)",
+    "--text": "#e9edf3",
+    "--muted": "rgba(233,237,243,0.72)",
+    "--border": "rgba(255,255,255,0.10)",
+
+    "--accent": "#ff7a18",
+    "--accent-2": "#ffb86b",
+
+    "--good": "#2ee59d",
+    "--warn": "#ffb400",
+    "--bad": "#ff3c3c",
+
+    "--radius": "18px",
+    "--shadow": "0 14px 40px rgba(0,0,0,0.45)",
+    "--blur": "10px",
+    "--glass": "0.055",
+
+    "--ui-font": "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+    "--mono-font": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace",
+    "--text-size": "14px",
+    "--title-size": "18px",
+
+    "--pad": "16px",
+    "--gap": "14px",
+    "--compact": "0",
+
+    "--warn-pct": "80",
+    "--danger-pct": "95"
+  }
+}
