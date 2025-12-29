@@ -321,3 +321,10 @@ groupCardsByHost();
 // Initial load + polling
 refreshAll();
 setInterval(refreshAll, window.DASHBOARD_POLL_MS || 5000);
+
+function applyThemePreview(tokens){
+  const root = document.documentElement;
+  Object.entries(tokens).forEach(([k,v])=>{
+    root.style.setProperty(k, v);
+  });
+}

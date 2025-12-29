@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Theme Editor</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+  <link rel="stylesheet" href="/theme.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="title">
+      <h1>Theme Editor</h1>
+      <p class="subtitle">Edit tokens • Live preview • Export/Import • Publish toggle</p>
+    </div>
+    <div class="summary">
+      <a class="btn" href="/">Dashboard</a>
+      <a class="btn" href="/themes">Themes</a>
+      <a class="btn" href="/logout">Logout</a>
+    </div>
+  </header>
+
+  <main class="container" style="display:grid;grid-template-columns:1.15fr 0.85fr;gap:var(--gap);">
+    <section class="panel">
+      <h2 style="margin-top:0;">Metadata</h2>
+
+      <div class="field">
+        <label for="name">Theme name</label>
+        <input class="input" id="name" value="{{ theme.name if theme else '' }}" placeholder="Shannara Ember">
+      </div>
+      <div class="field">
+        <label for="author">Author</label>
+        <input class="input" id="author" value="{{ theme.author if theme else '' }}" placeholder="Paul Mata">
+      </div>
+      <div class="field">
+        <label for="desc">Description</label>
+        <textarea class="input" id="desc" rows="3" placeholder="Dark grey + ember orange, subtle glow...">{{ theme.description if theme else '' }}</textarea>
+      </div>
+      <div class="field">
+        <label for="mode">Mode</label>
+        <select class="input" id="mode">
+          <option value="dark" {% if theme and theme.mode=='dark' %}selected{% endif %}>dark</option>
+          <option value="light" {% if theme and theme.mode=='light' %}selected{% endif %}>light</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Visibility</label>
+        <div style="display:flex;gap:10px;align-items:center;justify-content:flex-end;">
+          <span class="small-note">Private by default</span>
+          <label style="display:flex;gap:8px;align-items:center;">
+            <input id="is_public" type="checkbox" {% if theme and theme.is_public %}checked{% endif %}>
+            Publish
+          </label>
+        </div>
+      </div>
+
+      <hr class="sep">
+
+      <h2 style="margin:0 0 8px;">Tokens</h2>
+      <p class="small-note" style="margin-top:0;">
+        Edit values; changes preview instantly. Use Export to share. Import to bring in community themes.
+      </p>
+
+      <div id="tokens-grid"></div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
+        <button class="btn" id="btn-save">Save</button>
+        <button class="btn" id="btn-save-as">Save as New</button>
+        {% if theme %}
+        <form method="post" action="/themes/{{ theme.id }}/activate" style="display:inline;">
+          <button class="btn" type="submit">Activate</button>
+        </form>
+        {% endif %}
+        {% if theme %}
+        <a class="btn" href="/themes/{{ theme.id }}/export.json">Export JSON</a>
+        {% endif %}
+      </div>
+
+      <hr class="sep">
+
+      <h2 style="margin:0 0 8px;">Import</h2>
+      <p class="small-note">Paste a theme JSON (export format) and import it as a new private theme.</p>
+      <textarea class="input" id="import_json" rows="8" placeholder='{"schema":"homelab-dashboard-theme@1", ...}'></textarea>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn" id="btn-import">Import</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2 style="margin-top:0;">Live Preview</h2>
+      <p class="small-note">This preview uses your real dashboard styles + current token values.</p>
+
+      <div style="display:flex;gap:10px;align-items:center;margin:10px 0;">
+        <div class="pill">
+          <span class="dot up"></span><span>All good</span>
+        </div>
+        <div class="pill">
+          <span class="dot down"></span><span>Something down</span>
+        </div>
+      </div>
+
+      <a class="card" href="#" onclick="return false;">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="status-dot up"></span>
+            <span class="name">Immich</span>
+          </div>
+          <span class="badge up">UP • 200</span>
+        </div>
+        <div class="card-body">
+          <div class="row"><div class="label">Host CPU</div><div class="value mono ok">16.2%</div></div>
+          <div class="row"><div class="label">RAM %</div><div class="value mono warn">84.1%</div></div>
+          <div class="bar"><div class="fill warn" style="width:84%;"></div></div>
+          <hr class="sep">
+          <div class="row"><div class="label">Uptime</div><div class="value mono">Up 7 days</div></div>
+          <div class="row"><div class="label">Ctr RAM</div><div class="value mono">255 MB</div></div>
+        </div>
+      </a>
+
+      <hr class="sep">
+
+      <div class="field">
+        <label for="compact">Density</label>
+        <select class="input" id="compact">
+          <option value="0">Comfortable</option>
+          <option value="1">Compact</option>
+        </select>
+      </div>
+      <div class="small-note">
+        Compact mode toggles small spacing rules that read <code>--compact</code>.
+      </div>
+    </aside>
+  </main>
+<script>
+  window.THEME_EDITOR = {
+    themeId: {{ theme.id if theme else "null" }},
+    initialTokens: {{ tokens_json|tojson }}
+  };
+</script>
+<script src="{{ url_for('static', filename='themes_editor.js') }}"></script>
+
+</body>
+</html>

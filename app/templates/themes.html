@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Themes</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+  <link rel="stylesheet" href="/theme.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="title">
+      <h1>Themes</h1>
+      <p class="subtitle">Manage • Activate • Export • Publish</p>
+    </div>
+    <div class="summary">
+      <a class="btn" href="/">Dashboard</a>
+      <a class="btn" href="/themes/new">New Theme</a>
+      <a class="btn" href="/logout">Logout</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;">
+        <div>
+          <h2 style="margin:0;">Your Themes</h2>
+          <p class="small-note" style="margin:6px 0 0;">
+            Active theme applies to all pages via <code>/theme.css</code>.
+          </p>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <span class="pill">
+            <span class="dot up"></span>
+            <span>Active: <span class="mono">{{ active_slug if active_slug else "None" }}</span></span>
+          </span>
+          <a class="btn" href="/themes/new">+ Create Theme</a>
+        </div>
+      </div>
+
+      <hr class="sep">
+
+      {% if themes and themes|length > 0 %}
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:var(--gap);">
+          {% for t in themes %}
+            <div class="card" style="cursor:default;">
+              <div class="card-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div class="card-title" style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;">
+                  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                    <span class="name">{{ t.name }}</span>
+
+                    {% if active_slug and t.slug == active_slug %}
+                      <span class="badge up">ACTIVE</span>
+                    {% endif %}
+
+                    {% if t.mode %}
+                      <span class="badge">{{ t.mode|upper }}</span>
+                    {% endif %}
+
+                    {% if t.is_public %}
+                      <span class="badge up">PUBLIC</span>
+                    {% else %}
+                      <span class="badge warn">PRIVATE</span>
+                    {% endif %}
+                  </div>
+
+                  <div class="small-note">
+                    <span class="mono">{{ t.slug }}</span>
+                    {% if t.author %} • by {{ t.author }}{% endif %}
+                  </div>
+                </div>
+
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+                  <a class="btn" href="/themes/{{ t.id }}/edit">Edit</a>
+
+                  <form method="post" action="/themes/{{ t.id }}/activate" style="display:inline;">
+                    <button class="btn" type="submit" {% if active_slug and t.slug == active_slug %}disabled{% endif %}>
+                      Activate
+                    </button>
+                  </form>
+
+                  <a class="btn" href="/themes/{{ t.id }}/export.json">Export</a>
+
+                  <form method="post" action="/themes/{{ t.id }}/publish" style="display:inline;">
+                    <button class="btn" type="submit">
+                      {% if t.is_public %}Unpublish{% else %}Publish{% endif %}
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              {% if t.description %}
+                <div class="card-body">
+                  <div class="row">
+                    <div class="label">Description</div>
+                    <div class="value">{{ t.description }}</div>
+                  </div>
+                </div>
+              {% else %}
+                <div class="card-body">
+                  <div class="small-note">No description.</div>
+                </div>
+              {% endif %}
+
+              <div class="card-body" style="padding-top:0;">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                  <button class="btn" type="button" onclick="cloneTheme('{{ t.id }}')">Clone</button>
+                  <button class="btn" type="button" onclick="copyExportUrl('{{ t.id }}')">Copy Export URL</button>
+                </div>
+                <div class="small-note" style="margin-top:10px;">
+                  Clone creates a new private theme by exporting then importing.
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="small-note">No themes found. Create one to get started.</p>
+        <a class="btn" href="/themes/new">Create Theme</a>
+      {% endif %}
+    </section>
+
+    <section class="panel" style="margin-top:var(--gap);">
+      <h2 style="margin:0;">Import Theme</h2>
+      <p class="small-note" style="margin-top:6px;">
+        Paste a theme JSON (export format) and import it as a new private theme.
+      </p>
+
+      <textarea class="input" id="import_json" rows="10"
+        placeholder='{"schema":"homelab-dashboard-theme@1","name":"...","mode":"dark","tokens":{...}}'></textarea>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+        <button class="btn" type="button" onclick="importTheme()">Import</button>
+        <button class="btn" type="button" onclick="document.getElementById('import_json').value=''">Clear</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    async function postJSON(url, payload) {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || `HTTP ${res.status}`);
+      }
+      try { return await res.json(); } catch { return {}; }
+    }
+
+    async function importTheme() {
+      const raw = document.getElementById("import_json").value.trim();
+      if (!raw) return alert("Paste a theme JSON first.");
+      try {
+        const obj = JSON.parse(raw);
+        const out = await postJSON("/themes/import", obj);
+        if (out && out.id) {
+          window.location.href = `/themes/${out.id}/edit`;
+        } else {
+          window.location.reload();
+        }
+      } catch (e) {
+        alert(`Import failed: ${e.message}`);
+      }
+    }
+
+    async function cloneTheme(themeId) {
+      try {
+        // export
+        const res = await fetch(`/themes/${themeId}/export.json`);
+        if (!res.ok) throw new Error(`Export failed (HTTP ${res.status})`);
+        const obj = await res.json();
+
+        // tweak name to avoid collisions (server also enforces uniqueness)
+        obj.name = (obj.name || "Theme") + " (Copy)";
+
+        // import
+        const out = await postJSON("/themes/import", obj);
+        if (out && out.id) {
+          window.location.href = `/themes/${out.id}/edit`;
+        } else {
+          window.location.reload();
+        }
+      } catch (e) {
+        alert(`Clone failed: ${e.message}`);
+      }
+    }
+
+    async function copyExportUrl(themeId) {
+      const url = `${window.location.origin}/themes/${themeId}/export.json`;
+      try {
+        await navigator.clipboard.writeText(url);
+        alert("Copied!");
+      } catch (e) {
+        // fallback
+        prompt("Copy this URL:", url);
+      }
+    }
+  </script>
+</body>
+</html>

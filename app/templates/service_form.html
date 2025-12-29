@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="/theme.css">
+    <title>{% if svc %}Edit{% else %}New{% endif %} Service</title></head>
+<body style="font-family:sans-serif;max-width:760px;margin:40px auto;">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <h2>{% if svc %}Edit{% else %}New{% endif %} Service</h2>
+    <div><a href="/services">Back</a> • <a href="/logout">Logout</a></div>
+  </div>
+
+  <form method="post">
+    <label>Slug*</label><br>
+    <input name="slug" value="{{ svc.slug if svc else '' }}" style="width:100%;padding:8px"><br><br>
+
+    <label>Name*</label><br>
+    <input name="name" value="{{ svc.name if svc else '' }}" style="width:100%;padding:8px"><br><br>
+
+    <label>URL*</label><br>
+    <input name="url" value="{{ svc.url if svc else '' }}" style="width:100%;padding:8px"><br><br>
+
+    <label>Health URL*</label><br>
+    <input name="health_url" value="{{ svc.health_url if svc else '' }}" style="width:100%;padding:8px"><br><br>
+
+    <label>Group</label><br>
+    <input name="group" value="{{ svc.group if svc else '' }}" style="width:100%;padding:8px"><br><br>
+
+    <label>Beszel host (your friendly name, e.g. arborlon)</label><br>
+    <input name="beszel_host" value="{{ svc.beszel_host if svc else '' }}" style="width:100%;padding:8px"><br><br>
+
+    <label>Beszel container (e.g. immich_server)</label><br>
+    <input name="beszel_container" value="{{ svc.beszel_container if svc else '' }}" style="width:100%;padding:8px"><br><br>
+
+    <label>Dozzle container (optional; defaults to Beszel container)</label><br>
+    <input name="dozzle_container" value="{{ svc.dozzle_container if svc else '' }}" style="width:100%;padding:8px"><br><br>
+
+    <label>Basic auth user</label><br>
+    <input name="basic_user" value="{{ secret_user if secret_user else '' }}" style="width:100%;padding:8px"><br><br>
+
+    <label>Basic auth pass</label><br>
+    <input name="basic_pass" value="{{ secret_pass if secret_pass else '' }}" style="width:100%;padding:8px"><br><br>
+
+    <label>Headers (JSON object)</label><br>
+    <textarea name="headers_json" rows="6" style="width:100%;padding:8px">{{ secret_headers|tojson if secret_headers else '{}' }}</textarea><br><br>
+
+    <label>
+      <input type="checkbox" name="enabled" {% if svc and svc.enabled %}checked{% elif not svc %}checked{% endif %}>
+      Enabled
+    </label><br><br>
+
+    <button type="submit" style="padding:10px 14px">Save</button>
+  </form>
+</body>
+</html>

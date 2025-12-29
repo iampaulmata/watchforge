@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="/theme.css">
+    <title>Services</title></head>
+<body style="font-family:sans-serif;max-width:1100px;margin:40px auto;">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <h2>Services</h2>
+    <div>
+      <a href="/">Dashboard</a> •
+      <a href="/services/new">Add</a> •
+      <a href="/services/export.json">Export</a> •
+      <a href="/logout">Logout</a>
+    </div>
+  </div>
+
+  <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;">
+    <tr>
+      <th>Enabled</th><th>Slug</th><th>Name</th><th>Group</th><th>URL</th><th>Health</th><th>Beszel Host</th><th>Container</th><th>Actions</th>
+    </tr>
+    {% for s in services %}
+    <tr>
+      <td>{{ "✅" if s.enabled else "—" }}</td>
+      <td>{{ s.slug }}</td>
+      <td>{{ s.name }}</td>
+      <td>{{ s.group or "—" }}</td>
+      <td>{{ s.url }}</td>
+      <td>{{ s.health_url }}</td>
+      <td>{{ s.beszel_host or "—" }}</td>
+      <td>{{ s.beszel_container or "—" }}</td>
+      <td>
+        <a href="/services/{{ s.id }}/edit">Edit</a>
+        <form method="post" action="/services/{{ s.id }}/delete" style="display:inline" onsubmit="return confirm('Delete {{ s.name }}?')">
+          <button type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</body>
+</html>

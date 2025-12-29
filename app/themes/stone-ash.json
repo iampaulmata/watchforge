@@ -1,0 +1,40 @@
+{
+  "schema": "homelab-dashboard-theme@1",
+  "name": "Stone Ash",
+  "id": "stone-ash",
+  "author": "iampaulmata",
+  "description": "Clean light theme with subtle borders and calm accents.",
+  "mode": "light",
+  "tokens": {
+    "--bg": "#f6f7fb",
+    "--surface": "rgba(0,0,0,0.03)",
+    "--surface-2": "rgba(0,0,0,0.05)",
+    "--text": "#101624",
+    "--muted": "rgba(16,22,36,0.70)",
+    "--border": "rgba(16,22,36,0.12)",
+
+    "--accent": "#2d6cdf",
+    "--accent-2": "#00b894",
+
+    "--good": "#00b894",
+    "--warn": "#f39c12",
+    "--bad": "#e74c3c",
+
+    "--radius": "16px",
+    "--shadow": "0 10px 26px rgba(16,22,36,0.10)",
+    "--blur": "6px",
+    "--glass": "0.65",
+
+    "--ui-font": "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
+    "--mono-font": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace",
+    "--text-size": "14px",
+    "--title-size": "18px",
+
+    "--pad": "16px",
+    "--gap": "14px",
+    "--compact": "0",
+
+    "--warn-pct": "80",
+    "--danger-pct": "95"
+  }
+}
