@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# watchforge
-Watchforge: Forge clarity from your containers.
-=======
 # 🛠️ Watchforge — Homelab Service Dashboard
 
 Watchforge is a self‑hosted homelab dashboard for monitoring service health, host metrics (via Beszel), and container logs (via Dozzle), with a fully customizable theme system.
@@ -231,4 +227,3 @@ They are automatically seeded on first run and updated on restart.
 ---
 
 Built for homelabs that deserve better dashboards ⚔️
->>>>>>> ff10006 (version 0.1.0 with features to add/remove services and theming support)
